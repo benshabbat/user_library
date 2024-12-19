@@ -12,13 +12,15 @@
     "next": "15.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sass": "^1.83.0"
+    "sass": "^1.83.0",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.1.2",
     "typescript": "^5"
