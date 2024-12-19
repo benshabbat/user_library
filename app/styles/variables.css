@@ -1,0 +1,29 @@
+:root {
+  /* Primary colors */
+  --color-primary-50: #f8fafc;
+  --color-primary-100: #f1f5f9;
+  --color-primary-200: #e2e8f0;
+  --color-primary-300: #cbd5e1;
+  --color-primary-400: #94a3b8;
+  --color-primary-500: #64748b;
+  --color-primary-600: #475569;
+  --color-primary-700: #334155;
+  --color-primary-800: #1e293b;
+  --color-primary-900: #0f172a;
+
+  /* Background colors */
+  --color-background: var(--color-primary-800);
+  --color-card: var(--color-primary-700);
+  
+  /* Text colors */
+  --color-text-primary: var(--color-primary-50);
+  --color-text-secondary: var(--color-primary-300);
+  --color-text-tertiary: var(--color-primary-400);
+
+  /* Border colors */
+  --color-border: var(--color-primary-600);
+
+  /* Status colors */
+  --color-error: #ef4444;
+  --color-loading: var(--color-primary-400);
+}

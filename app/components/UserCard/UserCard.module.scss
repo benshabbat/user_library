@@ -1,56 +1,60 @@
 .card {
-    background: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.2s ease;
-  
-    &:hover {
-      transform: translateY(-2px);
-    }
+  background: var(--color-card);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  border: 1px solid var(--color-border);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
   }
-  
-  .cardContent {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
+}
+
+.cardContent {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+}
+
+.avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+}
+
+.info {
+  margin-left: 1rem;
+  flex: 1;
+}
+
+.name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  margin-bottom: 0.5rem;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    stroke: var(--color-text-tertiary);
   }
-  
-  .avatar {
-    width: 4rem;
-    height: 4rem;
-    border-radius: 50%;
-    object-fit: cover;
+
+  span {
+    word-break: break-word;
   }
-  
-  .info {
-    margin-left: 1rem;
-    flex: 1;
-  }
-  
-  .name {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
-    margin-bottom: 0.5rem;
-  }
-  
-  .detail {
-    display: flex;
-    align-items: center;
-    margin-top: 0.25rem;
-    color: #4b5563;
-    font-size: 0.875rem;
-  
-    svg {
-      width: 1rem;
-      height: 1rem;
-      margin-right: 0.5rem;
-      flex-shrink: 0;
-    }
-  
-    span {
-      word-break: break-word;
-    }
-  }
+}
