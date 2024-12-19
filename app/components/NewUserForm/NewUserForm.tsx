@@ -27,7 +27,7 @@ const DEFAULT_USER: EditableUser = {
 };
 
 export default function NewUserForm({ allUsers, onSave, onCancel }: NewUserFormProps) {
-  const handleSave = (userData: EditableUser) => {
+  const handleSave = (userData: EditableUser & { imageUrl?: string }) => {
     const newUser: User = {
       login: {
         uuid: crypto.randomUUID(),
@@ -36,7 +36,7 @@ export default function NewUserForm({ allUsers, onSave, onCancel }: NewUserFormP
       email: userData.email,
       location: userData.location,
       picture: {
-        medium: `/api/placeholder/100/100`,
+        medium: userData.imageUrl || `/api/placeholder/100/100`,
       },
     };
     
@@ -50,6 +50,7 @@ export default function NewUserForm({ allUsers, onSave, onCancel }: NewUserFormP
       onSave={handleSave}
       onCancel={onCancel}
       submitLabel="Add User"
+      showImageInput={true}
     />
   );
 }

@@ -4,14 +4,17 @@ import { useState } from 'react';
 import styles from './UserForm.module.scss';
 import { validateUser, ValidationError } from '../../utils/validation';
 import { User, EditableUser } from '@/types/user';
+import ImageUpload from '../ImageUpload/ImageUpload';
 
 interface UserFormProps {
   initialData: EditableUser;
   allUsers: User[];
-  onSave: (userData: EditableUser) => void;
+  onSave: (userData: EditableUser & { imageUrl?: string }) => void;
   onCancel: () => void;
   currentUserId?: string;
   submitLabel?: string;
+  showImageInput?: boolean;
+  initialImage?: string;
 }
 
 export default function UserForm({ 
@@ -20,10 +23,14 @@ export default function UserForm({
   onSave, 
   onCancel, 
   currentUserId,
-  submitLabel = 'Save Changes' 
+  submitLabel = 'Save Changes',
+  showImageInput = false,
+  initialImage = ''
 }: UserFormProps) {
   const [userData, setUserData] = useState<EditableUser>(initialData);
   const [errors, setErrors] = useState<ValidationError[]>([]);
+  const [imageUrl, setImageUrl] = useState(initialImage);
+  const [imagePreview, setImagePreview] = useState(initialImage);
 
   const getFieldError = (fieldName: string): string | undefined => {
     return errors.find(error => error.field === fieldName)?.message;
@@ -39,11 +46,24 @@ export default function UserForm({
     }
     
     setErrors([]);
-    onSave(userData);
+    onSave({ ...userData, imageUrl });
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
+      {showImageInput && (
+        <div className={`${styles.formGroup} ${styles.fullWidth} ${styles.imageSection}`}>
+          <label className={styles.label}>Profile Image</label>
+          <ImageUpload
+            onImageSelect={(imageUrl) => {
+              setImageUrl(imageUrl);
+              setImagePreview(imageUrl);
+            }}
+            initialImage={imagePreview}
+          />
+        </div>
+      )}
+
       <div className={styles.formGroup}>
         <label className={styles.label}>Title</label>
         <input
