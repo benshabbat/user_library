@@ -42,6 +42,7 @@ export default function UserList() {
   };
 
   const handleUpdateUser = (updatedUser: User) => {
+    console.log('Updating user with new data:', updatedUser);
     setUsers(currentUsers => 
       currentUsers.map(user => 
         user.login.uuid === updatedUser.login.uuid ? updatedUser : user
@@ -84,6 +85,7 @@ export default function UserList() {
 
       <Modal 
         isOpen={isAddingUser}
+        onClose={() => setIsAddingUser(false)}
         title="Add New User"
       >
         <NewUserForm

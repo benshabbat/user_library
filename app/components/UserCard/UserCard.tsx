@@ -5,7 +5,7 @@ import styles from './UserCard.module.scss';
 import { MailIcon, LocationIcon, EditIcon } from '../../icons';
 import Modal from '../Modal/Modal';
 import EditUserForm from '../EditUserForm/EditUserForm';
-import { User, EditableUser } from '@/types/user';
+import { User } from '@/types/user';
 
 interface UserCardProps {
   user: User;
@@ -24,13 +24,7 @@ export default function UserCard({ user: initialUser, allUsers, onUpdate }: User
   const fullName = `${user.name.title || ''} ${user.name.first || ''} ${user.name.last || ''}`.trim();
   const address = `${user.location.street?.name || ''} ${user.location.street?.number || ''}, ${user.location.city || ''}, ${user.location.country || ''}`.trim();
 
-  const handleSave = (editedUser: EditableUser) => {
-    const updatedUser = {
-      ...user,
-      name: editedUser.name,
-      email: editedUser.email,
-      location: editedUser.location,
-    };
+  const handleSave = (updatedUser: User) => {
     setUser(updatedUser);
     onUpdate(updatedUser);
     setIsEditing(false);
@@ -40,13 +34,11 @@ export default function UserCard({ user: initialUser, allUsers, onUpdate }: User
     <>
       <div className={styles.card}>
         <div className={styles.cardContent}>
-          {user.picture?.medium && (
-            <img
-              src={user.picture.medium}
-              alt={fullName}
-              className={styles.avatar}
-            />
-          )}
+          <img
+            src={user.picture?.medium}
+            alt={fullName}
+            className={styles.avatar}
+          />
           <div className={styles.info}>
             <div className={styles.nameContainer}>
               <h2 className={styles.name}>{fullName}</h2>

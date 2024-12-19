@@ -6,31 +6,30 @@ import { validateUser, ValidationError } from '../../utils/validation';
 import { User, EditableUser } from '@/types/user';
 import ImageUpload from '../ImageUpload/ImageUpload';
 
-interface UserFormProps {
-  initialData: EditableUser;
-  allUsers: User[];
-  onSave: (userData: EditableUser & { imageUrl?: string }) => void;
+interface UserFormProps<T> {
+  initialData: T;
+  onSave: (data: T & { imageUrl?: string }) => void;
   onCancel: () => void;
+  allUsers?: User[];
   currentUserId?: string;
   submitLabel?: string;
-  showImageInput?: boolean;
+  showImage?: boolean;
   initialImage?: string;
 }
 
-export default function UserForm({ 
+export default function UserForm<T extends EditableUser>({ 
   initialData, 
-  allUsers, 
   onSave, 
   onCancel, 
+  allUsers = [],
   currentUserId,
-  submitLabel = 'Save Changes',
-  showImageInput = false,
-  initialImage = ''
-}: UserFormProps) {
-  const [userData, setUserData] = useState<EditableUser>(initialData);
+  submitLabel = 'Save',
+  showImage = true,
+  initialImage = initialData.picture?.medium || ''
+}: UserFormProps<T>) {
+  const [formData, setFormData] = useState<T>(initialData);
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [imageUrl, setImageUrl] = useState(initialImage);
-  const [imagePreview, setImagePreview] = useState(initialImage);
 
   const getFieldError = (fieldName: string): string | undefined => {
     return errors.find(error => error.field === fieldName)?.message;
@@ -39,27 +38,46 @@ export default function UserForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const validationErrors = validateUser(userData, allUsers, currentUserId);
+    const validationErrors = validateUser(formData, allUsers, currentUserId);
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       return;
     }
     
     setErrors([]);
-    onSave({ ...userData, imageUrl });
+    onSave({ ...formData, imageUrl });
+  };
+
+  const updateField = <K extends keyof T>(
+    field: K, 
+    value: T[K] | string, 
+    parent?: keyof T
+  ) => {
+    setFormData(prev => {
+      if (parent) {
+        return {
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [field]: value
+          }
+        };
+      }
+      return {
+        ...prev,
+        [field]: value
+      };
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      {showImageInput && (
+      {showImage && (
         <div className={`${styles.formGroup} ${styles.fullWidth} ${styles.imageSection}`}>
           <label className={styles.label}>Profile Image</label>
           <ImageUpload
-            onImageSelect={(imageUrl) => {
-              setImageUrl(imageUrl);
-              setImagePreview(imageUrl);
-            }}
-            initialImage={imagePreview}
+            onImageSelect={(url) => setImageUrl(url)}
+            initialImage={imageUrl}
           />
         </div>
       )}
@@ -68,11 +86,8 @@ export default function UserForm({
         <label className={styles.label}>Title</label>
         <input
           className={`${styles.input} ${getFieldError('title') ? styles.error : ''}`}
-          value={userData.name.title}
-          onChange={(e) => setUserData({
-            ...userData,
-            name: { ...userData.name, title: e.target.value }
-          })}
+          value={formData.name.title}
+          onChange={(e) => updateField('title', e.target.value, 'name')}
           placeholder="e.g. Mr, Mrs, Ms"
         />
         {getFieldError('title') && (
@@ -84,11 +99,8 @@ export default function UserForm({
         <label className={styles.label}>First Name</label>
         <input
           className={`${styles.input} ${getFieldError('first') ? styles.error : ''}`}
-          value={userData.name.first}
-          onChange={(e) => setUserData({
-            ...userData,
-            name: { ...userData.name, first: e.target.value }
-          })}
+          value={formData.name.first}
+          onChange={(e) => updateField('first', e.target.value, 'name')}
           placeholder="First name"
         />
         {getFieldError('first') && (
@@ -100,11 +112,8 @@ export default function UserForm({
         <label className={styles.label}>Last Name</label>
         <input
           className={`${styles.input} ${getFieldError('last') ? styles.error : ''}`}
-          value={userData.name.last}
-          onChange={(e) => setUserData({
-            ...userData,
-            name: { ...userData.name, last: e.target.value }
-          })}
+          value={formData.name.last}
+          onChange={(e) => updateField('last', e.target.value, 'name')}
           placeholder="Last name"
         />
         {getFieldError('last') && (
@@ -116,11 +125,8 @@ export default function UserForm({
         <label className={styles.label}>Email</label>
         <input
           className={`${styles.input} ${getFieldError('email') ? styles.error : ''}`}
-          value={userData.email}
-          onChange={(e) => setUserData({
-            ...userData,
-            email: e.target.value
-          })}
+          value={formData.email}
+          onChange={(e) => updateField('email', e.target.value)}
           placeholder="Email address"
           type="text"
         />
@@ -133,14 +139,17 @@ export default function UserForm({
         <label className={styles.label}>Street Name</label>
         <input
           className={`${styles.input} ${getFieldError('streetName') ? styles.error : ''}`}
-          value={userData.location.street.name}
-          onChange={(e) => setUserData({
-            ...userData,
+          value={formData.location.street.name}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
             location: {
-              ...userData.location,
-              street: { ...userData.location.street, name: e.target.value }
+              ...prev.location,
+              street: {
+                ...prev.location.street,
+                name: e.target.value
+              }
             }
-          })}
+          }))}
           placeholder="Street name"
         />
         {getFieldError('streetName') && (
@@ -153,14 +162,17 @@ export default function UserForm({
         <input
           className={`${styles.input} ${getFieldError('streetNumber') ? styles.error : ''}`}
           type="number"
-          value={userData.location.street.number}
-          onChange={(e) => setUserData({
-            ...userData,
+          value={formData.location.street.number}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
             location: {
-              ...userData.location,
-              street: { ...userData.location.street, number: parseInt(e.target.value) || 0 }
+              ...prev.location,
+              street: {
+                ...prev.location.street,
+                number: parseInt(e.target.value) || 0
+              }
             }
-          })}
+          }))}
           placeholder="Street number"
         />
         {getFieldError('streetNumber') && (
@@ -172,11 +184,14 @@ export default function UserForm({
         <label className={styles.label}>City</label>
         <input
           className={`${styles.input} ${getFieldError('city') ? styles.error : ''}`}
-          value={userData.location.city}
-          onChange={(e) => setUserData({
-            ...userData,
-            location: { ...userData.location, city: e.target.value }
-          })}
+          value={formData.location.city}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            location: {
+              ...prev.location,
+              city: e.target.value
+            }
+          }))}
           placeholder="City"
         />
         {getFieldError('city') && (
@@ -188,11 +203,14 @@ export default function UserForm({
         <label className={styles.label}>Country</label>
         <input
           className={`${styles.input} ${getFieldError('country') ? styles.error : ''}`}
-          value={userData.location.country}
-          onChange={(e) => setUserData({
-            ...userData,
-            location: { ...userData.location, country: e.target.value }
-          })}
+          value={formData.location.country}
+          onChange={(e) => setFormData(prev => ({
+            ...prev,
+            location: {
+              ...prev.location,
+              country: e.target.value
+            }
+          }))}
           placeholder="Country"
         />
         {getFieldError('country') && (

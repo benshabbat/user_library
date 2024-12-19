@@ -32,25 +32,21 @@ export default function NewUserForm({ allUsers, onSave, onCancel }: NewUserFormP
       login: {
         uuid: crypto.randomUUID(),
       },
-      name: userData.name,
-      email: userData.email,
-      location: userData.location,
+      ...userData,
       picture: {
-        medium: userData.imageUrl || `/api/placeholder/100/100`,
-      },
+        medium: userData.imageUrl || `/api/placeholder/100/100`
+      }
     };
-    
     onSave(newUser);
   };
 
   return (
-    <UserForm
+    <UserForm<EditableUser>
       initialData={DEFAULT_USER}
       allUsers={allUsers}
       onSave={handleSave}
       onCancel={onCancel}
       submitLabel="Add User"
-      showImageInput={true}
     />
   );
 }

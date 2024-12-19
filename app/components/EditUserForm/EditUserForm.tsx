@@ -6,25 +6,34 @@ import { User, EditableUser } from '@/types/user';
 interface EditUserFormProps {
   user: User;
   allUsers: User[];
-  onSave: (editedUser: EditableUser) => void;
+  onSave: (editedUser: User) => void;
   onCancel: () => void;
 }
 
 export default function EditUserForm({ user, allUsers, onSave, onCancel }: EditUserFormProps) {
-  const initialData: EditableUser = {
-    name: user.name,
-    email: user.email,
-    location: user.location,
+  const handleSave = (userData: EditableUser & { imageUrl?: string }) => {
+    console.log('Edit form received data:', userData);
+    const updatedUser: User = {
+      ...user,
+      ...userData,
+      picture: {
+        medium: userData.imageUrl || user.picture.medium
+      }
+    };
+    console.log('Sending updated user:', updatedUser);
+    onSave(updatedUser);
   };
 
   return (
-    <UserForm
-      initialData={initialData}
+    <UserForm<EditableUser>
+      initialData={user}
       allUsers={allUsers}
-      onSave={onSave}
+      onSave={handleSave}
       onCancel={onCancel}
       currentUserId={user.login.uuid}
       submitLabel="Save Changes"
+      initialImage={user.picture?.medium}
+      showImage={true}
     />
   );
 }
