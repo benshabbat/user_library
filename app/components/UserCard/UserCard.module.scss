@@ -1,0 +1,56 @@
+.card {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+  
+  .cardContent {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  .avatar {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .info {
+    margin-left: 1rem;
+    flex: 1;
+  }
+  
+  .name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .detail {
+    display: flex;
+    align-items: center;
+    margin-top: 0.25rem;
+    color: #4b5563;
+    font-size: 0.875rem;
+  
+    svg {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.5rem;
+      flex-shrink: 0;
+    }
+  
+    span {
+      word-break: break-word;
+    }
+  }
