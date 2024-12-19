@@ -45,14 +45,27 @@ export default function UserList() {
     );
   }
 
+  const handleUpdateUser = (updatedUser: User) => {
+    setUsers(currentUsers => 
+      currentUsers.map(user => 
+        user.login.uuid === updatedUser.login.uuid ? updatedUser : user
+      )
+    );
+  };
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>User Library</h1>
       <div className={styles.grid}>
         {users.map((user) => (
-          user && user.login?.uuid ? 
-            <UserCard key={user.login.uuid} user={user} /> : 
-            null
+          user && user.login?.uuid ? (
+            <UserCard 
+              key={user.login.uuid} 
+              user={user} 
+              allUsers={users}
+              onUpdate={handleUpdateUser}
+            />
+          ) : null
         ))}
       </div>
     </div>

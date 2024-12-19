@@ -1,0 +1,174 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+  }
+  
+  .modal {
+    background: var(--color-card);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+    border: 1px solid var(--color-border);
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .title {
+    color: var(--color-text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .fullWidth {
+    grid-column: 1 / -1;
+  }
+  
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .label {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .input {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  
+    &:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+  
+    &:hover:not(:focus) {
+      border-color: var(--color-text-secondary);
+    }
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    grid-column: 1 / -1;
+  }
+  
+  .button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .saveButton {
+    composes: button;
+    background: #2563eb;
+    color: white;
+  
+    &:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+  
+    &:active {
+      transform: translateY(0);
+    }
+  }
+  
+  .cancelButton {
+    composes: button;
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+  
+    &:hover {
+      background: var(--color-background);
+      transform: translateY(-1px);
+    }
+  
+    &:active {
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .modal {
+      padding: 1.5rem;
+      width: 95%;
+    }
+  
+    .form {
+      grid-template-columns: 1fr;
+    }
+  
+    .buttons {
+      flex-direction: column-reverse;
+    }
+  
+    .button {
+      width: 100%;
+    }
+  }
