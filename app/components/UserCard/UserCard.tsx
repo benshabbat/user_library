@@ -2,19 +2,27 @@
 
 import { useState } from 'react';
 import styles from './UserCard.module.scss';
-import { MailIcon, LocationIcon, EditIcon } from '../../icons';
+import { MailIcon, LocationIcon, EditIcon, TrashIcon } from '../../icons';
 import Modal from '../Modal/Modal';
 import EditUserForm from '../EditUserForm/EditUserForm';
+import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import { User } from '@/types/user';
 
 interface UserCardProps {
   user: User;
   allUsers: User[];
   onUpdate: (updatedUser: User) => void;
+  onDelete: (userId: string) => void;
 }
 
-export default function UserCard({ user: initialUser, allUsers, onUpdate }: UserCardProps) {
+export default function UserCard({ 
+  user: initialUser, 
+  allUsers, 
+  onUpdate,
+  onDelete 
+}: UserCardProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [user, setUser] = useState(initialUser);
 
   if (!user || !user.name || !user.location || !user.login) {
@@ -30,6 +38,11 @@ export default function UserCard({ user: initialUser, allUsers, onUpdate }: User
     setIsEditing(false);
   };
 
+  const handleDelete = () => {
+    onDelete(user.login.uuid);
+    setIsConfirmingDelete(false);
+  };
+
   return (
     <>
       <div className={styles.card}>
@@ -42,12 +55,20 @@ export default function UserCard({ user: initialUser, allUsers, onUpdate }: User
           <div className={styles.info}>
             <div className={styles.nameContainer}>
               <h2 className={styles.name}>{fullName}</h2>
-              <button 
-                onClick={() => setIsEditing(true)}
-                className={styles.editButton}
-              >
-                <EditIcon />
-              </button>
+              <div className={styles.actions}>
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className={styles.actionButton}
+                >
+                  <EditIcon />
+                </button>
+                <button 
+                  onClick={() => setIsConfirmingDelete(true)}
+                  className={`${styles.actionButton} ${styles.deleteButton}`}
+                >
+                  <TrashIcon />
+                </button>
+              </div>
             </div>
             <div className={styles.detail}>
               <MailIcon />
@@ -71,6 +92,18 @@ export default function UserCard({ user: initialUser, allUsers, onUpdate }: User
           allUsers={allUsers}
           onSave={handleSave}
           onCancel={() => setIsEditing(false)}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={isConfirmingDelete}
+        onClose={() => setIsConfirmingDelete(false)}
+        title="Delete User"
+      >
+        <ConfirmationDialog
+          message={`Are you sure you want to delete ${fullName}? This action cannot be undone.`}
+          onConfirm={handleDelete}
+          onCancel={() => setIsConfirmingDelete(false)}
         />
       </Modal>
     </>

@@ -50,6 +50,10 @@ export default function UserList() {
     );
   };
 
+  const handleDeleteUser = (userId: string) => {
+    setUsers(currentUsers => currentUsers.filter(user => user.login.uuid !== userId));
+  };
+
   if (loading) {
     return <div className={styles.loading}>Loading users...</div>;
   }
@@ -78,6 +82,7 @@ export default function UserList() {
               user={user} 
               allUsers={users}
               onUpdate={handleUpdateUser}
+              onDelete={handleDeleteUser}
             />
           ) : null
         ))}
