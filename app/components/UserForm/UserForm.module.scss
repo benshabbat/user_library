@@ -1,39 +1,41 @@
 .form {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
+  gap: 0.5rem; // Reduced from 0.75rem
+  max-width: 500px; // Added max-width
+  margin: 0 auto;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem; // Reduced from 0.25rem
 }
 
 .fullWidth {
   grid-column: 1 / -1;
 }
 
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
 .label {
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: 0.7rem; // Reduced from 0.75rem
   font-weight: 500;
 }
 
 .input {
-  padding: 0.4rem 0.5rem;
-  border-radius: 0.375rem;
+  padding: 0.3rem 0.4rem; // Reduced from 0.4rem 0.5rem
+  border-radius: 0.25rem; // Reduced from 0.375rem
   border: 1px solid var(--color-border);
   background: var(--color-background);
   color: var(--color-text-primary);
-  font-size: 0.875rem;
+  font-size: 0.8rem; // Reduced from 0.875rem
   transition: all 0.2s ease;
-  height: 32px;
+  height: 28px; // Reduced from 32px
 
   &:focus {
     outline: none;
     border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2); // Reduced shadow spread
   }
 
   &:hover:not(:focus) {
@@ -41,75 +43,70 @@
   }
 
   &.error {
-    border-color: #ef4444;
+    border-color: #EF4444;
+    background-color: #FEF2F2;
     
     &:focus {
-      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+      border-color: #EF4444;
+      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
     }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
 .errorText {
-  color: #ef4444;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
+  color: #EF4444;
+  font-size: 0.7rem; // Reduced from 0.75rem
+  margin-top: 0.2rem; // Reduced from 0.25rem
+}
+
+.formError {
+  background-color: #FEE2E2;
+  border: 1px solid #EF4444;
+  color: #991B1B;
+  padding: 0.5rem; // Reduced from 0.75rem
+  border-radius: 0.25rem; // Reduced from 0.375rem
+  margin-bottom: 0.75rem; // Reduced from 1rem
+  font-size: 0.8rem; // Reduced from 0.875rem
+  grid-column: 1 / -1;
 }
 
 .imageSection {
-  margin-bottom: 1rem;
-}
-
-.imageInputContainer {
-  display: flex;
-  gap: 1rem;
-  align-items: start;
-}
-
-.imagePreview {
-  width: 100px;
-  height: 100px;
-  border-radius: 0.375rem;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  flex-shrink: 0;
-  background: var(--color-background);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+  margin-bottom: 0.5rem; // Reduced from 0.75rem
 }
 
 .buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
+  gap: 0.5rem; // Reduced from 0.75rem
+  margin-top: 0.75rem; // Reduced from 1rem
+  padding-top: 0.75rem; // Reduced from 1rem
   border-top: 1px solid var(--color-border);
   grid-column: 1 / -1;
 }
-.imageSection {
-  margin-bottom: 0.75rem;
-  
-  .label {
-    margin-bottom: 0.25rem;
-  }
-}
 
 .button {
-  padding: 0.4rem 1rem;
-  border-radius: 0.375rem;
+  padding: 0.3rem 0.75rem; // Reduced from 0.4rem 1rem
+  border-radius: 0.25rem; // Reduced from 0.375rem
   border: none;
-  font-size: 0.75rem;
+  font-size: 0.7rem; // Reduced from 0.75rem
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  height: 32px;
+  height: 28px; // Reduced from 32px
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 70px; // Added minimum width
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .saveButton {
@@ -117,7 +114,7 @@
   background: #2563eb;
   color: white;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: #1d4ed8;
   }
 }
@@ -128,7 +125,7 @@
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--color-background);
   }
 }
@@ -136,13 +133,15 @@
 @media (max-width: 480px) {
   .form {
     grid-template-columns: 1fr;
+    gap: 0.4rem; // Further reduced for mobile
   }
 
   .buttons {
-    flex-direction: row;
+    flex-direction: row; // Changed from column-reverse
+    justify-content: flex-end;
   }
 
   .button {
-    flex: 1;
+    width: auto; // Changed from 100%
   }
 }

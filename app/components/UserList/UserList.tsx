@@ -90,7 +90,6 @@ export default function UserList() {
 
       <Modal 
         isOpen={isAddingUser}
-        onClose={() => setIsAddingUser(false)}
         title="Add New User"
       >
         <NewUserForm

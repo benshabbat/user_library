@@ -6,6 +6,14 @@ import { validateUser, ValidationError } from '../../utils/validation';
 import { User, EditableUser } from '@/types/user';
 import ImageUpload from '../ImageUpload/ImageUpload';
 
+interface FormField {
+  name: string;           
+  label: string;         
+  type?: string;         
+  placeholder?: string;
+  fullWidth?: boolean;
+}
+
 interface UserFormProps<T> {
   initialData: T;
   onSave: (data: T & { imageUrl?: string }) => void;
@@ -16,6 +24,68 @@ interface UserFormProps<T> {
   showImage?: boolean;
   initialImage?: string;
 }
+
+const FORM_FIELDS: FormField[] = [
+  {
+    name: 'name.title',
+    label: 'Title',
+    placeholder: 'e.g. Mr, Mrs, Ms'
+  },
+  {
+    name: 'name.first',
+    label: 'First Name',
+    placeholder: 'First name'
+  },
+  {
+    name: 'name.last',
+    label: 'Last Name',
+    placeholder: 'Last name'
+  },
+  {
+    name: 'email',
+    label: 'Email',
+    type: 'email',
+    placeholder: 'Email address',
+    fullWidth: true
+  },
+  {
+    name: 'location.street.name',
+    label: 'Street Name',
+    placeholder: 'Street name'
+  },
+  {
+    name: 'location.street.number',
+    label: 'Street Number',
+    type: 'number',
+    placeholder: 'Street number'
+  },
+  {
+    name: 'location.city',
+    label: 'City',
+    placeholder: 'City'
+  },
+  {
+    name: 'location.country',
+    label: 'Country',
+    placeholder: 'Country'
+  }
+];
+
+const getNestedValue = (obj: any, path: string) => {
+  return path.split('.').reduce((acc, part) => acc?.[part], obj);
+};
+
+const updateNestedField = (obj: any, path: string[], value: any): any => {
+  if (path.length === 1) {
+    return { ...obj, [path[0]]: value };
+  }
+  
+  const [current, ...rest] = path;
+  return {
+    ...obj,
+    [current]: updateNestedField(obj[current], rest, value)
+  };
+};
 
 export default function UserForm<T extends EditableUser>({ 
   initialData, 
@@ -30,200 +100,119 @@ export default function UserForm<T extends EditableUser>({
   const [formData, setFormData] = useState<T>(initialData);
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [imageUrl, setImageUrl] = useState(initialImage);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getFieldError = (fieldName: string): string | undefined => {
     return errors.find(error => error.field === fieldName)?.message;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     const validationErrors = validateUser(formData, allUsers, currentUserId);
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
+      setIsSubmitting(false);
+      
+      // Scroll to first error
+      const firstErrorField = document.querySelector(`.${styles.error}`);
+      firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
     
-    setErrors([]);
-    onSave({ ...formData, imageUrl });
+    try {
+      setErrors([]);
+      await onSave({ ...formData, imageUrl });
+    } catch (error) {
+      setErrors([{ field: 'form', message: 'Failed to save user. Please try again.' }]);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const updateField = <K extends keyof T>(
-    field: K, 
-    value: T[K] | string, 
-    parent?: keyof T
-  ) => {
-    setFormData(prev => {
-      if (parent) {
-        return {
-          ...prev,
-          [parent]: {
-            ...prev[parent],
-            [field]: value
-          }
-        };
-      }
-      return {
-        ...prev,
-        [field]: value
-      };
-    });
+  const handleInputChange = ({ target: { value, type } }: React.ChangeEvent<HTMLInputElement>, field: FormField) => {
+    const parsedValue = type === 'number' ? parseInt(value) || 0 : value;
+    updateField(field.name, parsedValue);
+  };
+
+  const updateField = (path: string, value: any) => {
+    const fields = path.split('.');
+    setFormData(prev => updateNestedField(prev, fields, value));
+  };
+
+  const handleImageSelect = (url: string) => {
+    setImageUrl(url);
+  };
+
+  const renderField = (field: FormField) => {
+    const { name, label, type = 'text', placeholder, fullWidth } = field;
+    const errorMessage = getFieldError(name.split('.').pop()!);
+
+    return (
+      <div 
+        key={name}
+        className={`${styles.formGroup} ${fullWidth ? styles.fullWidth : ''}`}
+      >
+        <label className={styles.label}>{label}</label>
+        <input
+          className={`${styles.input} ${errorMessage ? styles.error : ''}`}
+          value={getNestedValue(formData, name)}
+          onChange={(e) => handleInputChange(e, field)}
+          placeholder={placeholder}
+          type={type}
+          aria-invalid={!!errorMessage}
+          aria-describedby={errorMessage ? `${name}-error` : undefined}
+          disabled={isSubmitting}
+        />
+        {errorMessage && (
+          <span 
+            className={styles.errorText}
+            id={`${name}-error`}
+            role="alert"
+          >
+            {errorMessage}
+          </span>
+        )}
+      </div>
+    );
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <form onSubmit={handleSubmit} className={styles.form} noValidate>
+      {getFieldError('form') && (
+        <div className={styles.formError} role="alert">
+          {getFieldError('form')}
+        </div>
+      )}
+
       {showImage && (
         <div className={`${styles.formGroup} ${styles.fullWidth} ${styles.imageSection}`}>
           <label className={styles.label}>Profile Image</label>
           <ImageUpload
-            onImageSelect={(url) => setImageUrl(url)}
+            onImageSelect={handleImageSelect}
             initialImage={imageUrl}
           />
         </div>
       )}
 
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Title</label>
-        <input
-          className={`${styles.input} ${getFieldError('title') ? styles.error : ''}`}
-          value={formData.name.title}
-          onChange={(e) => updateField('title', e.target.value, 'name')}
-          placeholder="e.g. Mr, Mrs, Ms"
-        />
-        {getFieldError('title') && (
-          <span className={styles.errorText}>{getFieldError('title')}</span>
-        )}
-      </div>
-
-      <div className={styles.formGroup}>
-        <label className={styles.label}>First Name</label>
-        <input
-          className={`${styles.input} ${getFieldError('first') ? styles.error : ''}`}
-          value={formData.name.first}
-          onChange={(e) => updateField('first', e.target.value, 'name')}
-          placeholder="First name"
-        />
-        {getFieldError('first') && (
-          <span className={styles.errorText}>{getFieldError('first')}</span>
-        )}
-      </div>
-
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Last Name</label>
-        <input
-          className={`${styles.input} ${getFieldError('last') ? styles.error : ''}`}
-          value={formData.name.last}
-          onChange={(e) => updateField('last', e.target.value, 'name')}
-          placeholder="Last name"
-        />
-        {getFieldError('last') && (
-          <span className={styles.errorText}>{getFieldError('last')}</span>
-        )}
-      </div>
-
-      <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-        <label className={styles.label}>Email</label>
-        <input
-          className={`${styles.input} ${getFieldError('email') ? styles.error : ''}`}
-          value={formData.email}
-          onChange={(e) => updateField('email', e.target.value)}
-          placeholder="Email address"
-          type="text"
-        />
-        {getFieldError('email') && (
-          <span className={styles.errorText}>{getFieldError('email')}</span>
-        )}
-      </div>
-
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Street Name</label>
-        <input
-          className={`${styles.input} ${getFieldError('streetName') ? styles.error : ''}`}
-          value={formData.location.street.name}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            location: {
-              ...prev.location,
-              street: {
-                ...prev.location.street,
-                name: e.target.value
-              }
-            }
-          }))}
-          placeholder="Street name"
-        />
-        {getFieldError('streetName') && (
-          <span className={styles.errorText}>{getFieldError('streetName')}</span>
-        )}
-      </div>
-
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Street Number</label>
-        <input
-          className={`${styles.input} ${getFieldError('streetNumber') ? styles.error : ''}`}
-          type="number"
-          value={formData.location.street.number}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            location: {
-              ...prev.location,
-              street: {
-                ...prev.location.street,
-                number: parseInt(e.target.value) || 0
-              }
-            }
-          }))}
-          placeholder="Street number"
-        />
-        {getFieldError('streetNumber') && (
-          <span className={styles.errorText}>{getFieldError('streetNumber')}</span>
-        )}
-      </div>
-
-      <div className={styles.formGroup}>
-        <label className={styles.label}>City</label>
-        <input
-          className={`${styles.input} ${getFieldError('city') ? styles.error : ''}`}
-          value={formData.location.city}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            location: {
-              ...prev.location,
-              city: e.target.value
-            }
-          }))}
-          placeholder="City"
-        />
-        {getFieldError('city') && (
-          <span className={styles.errorText}>{getFieldError('city')}</span>
-        )}
-      </div>
-
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Country</label>
-        <input
-          className={`${styles.input} ${getFieldError('country') ? styles.error : ''}`}
-          value={formData.location.country}
-          onChange={(e) => setFormData(prev => ({
-            ...prev,
-            location: {
-              ...prev.location,
-              country: e.target.value
-            }
-          }))}
-          placeholder="Country"
-        />
-        {getFieldError('country') && (
-          <span className={styles.errorText}>{getFieldError('country')}</span>
-        )}
-      </div>
+      {FORM_FIELDS.map(renderField)}
 
       <div className={styles.buttons}>
-        <button type="button" className={styles.cancelButton} onClick={onCancel}>
+        <button 
+          type="button" 
+          className={styles.cancelButton} 
+          onClick={onCancel}
+          disabled={isSubmitting}
+        >
           Cancel
         </button>
-        <button type="submit" className={styles.saveButton}>
-          {submitLabel}
+        <button 
+          type="submit" 
+          className={styles.saveButton}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Saving...' : submitLabel}
         </button>
       </div>
     </form>
