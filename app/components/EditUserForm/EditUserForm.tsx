@@ -1,8 +1,8 @@
 'use client';
 
 import UserForm from '../UserForm/UserForm';
-import { User, EditableUser } from '@/types/user.types';
-import { BaseFormProps } from '@/types/form.types';
+import { User, EditableUser } from '../../types/user';
+import { BaseFormProps } from '../../types/form';
 
 interface EditUserFormProps extends BaseFormProps<User> {
   user: User;

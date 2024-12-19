@@ -26,4 +26,12 @@
   /* Status colors */
   --color-error: #ef4444;
   --color-loading: var(--color-primary-400);
+
+
+  --color-primary-button: #2563eb;
+  --color-primary-button-hover: #1d4ed8;
+  --color-danger-button: #dc2626;
+  --color-danger-button-hover: #b91c1c;
+  --color-secondary-button: #4b5563;
+  --color-secondary-button-hover: #374151;
 }

@@ -63,3 +63,19 @@ export const TrashIcon = () => (
     <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
   </svg>
 );
+
+
+export const ErrorIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+  >
+    <circle cx="8" cy="8" r="7" />
+    <path d="M8 4.5v4" strokeLinecap="round" />
+    <circle cx="8" cy="11" r="0.5" fill="currentColor" stroke="none" />
+  </svg>
+);
