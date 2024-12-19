@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import styles from './UserForm.module.scss';
 import { validateUser, ValidationError } from '../../utils/validation';
-import { User, EditableUser } from '@/types/user';
+import { User, EditableUser } from '@/app/types/user';
 import ImageUpload from '../ImageUpload/ImageUpload';
 
 interface FormField {

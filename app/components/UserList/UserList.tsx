@@ -5,7 +5,8 @@ import UserCard from '../UserCard/UserCard';
 import Modal from '../Modal/Modal';
 import NewUserForm from '../NewUserForm/NewUserForm';
 import styles from './UserList.module.scss';
-import { User } from '@/types/user';
+import { User } from '../../types/user';
+import { userService } from '../../services/user.service';
 
 export default function UserList() {
   const [users, setUsers] = useState<User[]>([]);
@@ -14,44 +15,52 @@ export default function UserList() {
   const [isAddingUser, setIsAddingUser] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const loadUsers = async () => {
       try {
-        const response = await fetch('https://randomuser.me/api/?results=10');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const { results } = await response.json();
-        if (results) {
-          setUsers(results);
-        } else {
-          throw new Error('Invalid data format');
-        }
-        setLoading(false);
+        const results = await userService.fetchUsers();
+        setUsers(results);
       } catch (err) {
         setError('Failed to fetch users');
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    loadUsers();
   }, []);
 
-  const handleAddUser = (newUser: User) => {
-    setUsers(currentUsers => [...currentUsers, newUser]);
-    setIsAddingUser(false);
+  const handleAddUser = async (newUser: User) => {
+    try {
+      await userService.createUser(newUser);
+      setUsers(currentUsers => [...currentUsers, newUser]);
+      setIsAddingUser(false);
+    } catch (error) {
+      console.error('Failed to add user:', error);
+    }
   };
 
-  const handleUpdateUser = (updatedUser: User) => {
-    console.log('Updating user with new data:', updatedUser);
-    setUsers(currentUsers => 
-      currentUsers.map(user => 
-        user.login.uuid === updatedUser.login.uuid ? updatedUser : user
-      )
-    );
+  const handleUpdateUser = async (updatedUser: User) => {
+    try {
+      await userService.updateUser(updatedUser);
+      setUsers(currentUsers => 
+        currentUsers.map(user => 
+          user.login.uuid === updatedUser.login.uuid ? updatedUser : user
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update user:', error);
+    }
   };
 
-  const handleDeleteUser = (userId: string) => {
-    setUsers(currentUsers => currentUsers.filter(user => user.login.uuid !== userId));
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      await userService.deleteUser(userId);
+      setUsers(currentUsers => 
+        currentUsers.filter(user => user.login.uuid !== userId)
+      );
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+    }
   };
 
   if (loading) {
@@ -90,6 +99,7 @@ export default function UserList() {
 
       <Modal 
         isOpen={isAddingUser}
+        onClose={() => setIsAddingUser(false)}
         title="Add New User"
       >
         <NewUserForm

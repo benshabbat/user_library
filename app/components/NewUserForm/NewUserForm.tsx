@@ -1,12 +1,11 @@
 'use client';
 
 import UserForm from '../UserForm/UserForm';
-import { User, EditableUser } from '@/types/user';
+import { User, EditableUser } from '@/types/user.types';
+import { BaseFormProps } from '@/types/form.types';
 
-interface NewUserFormProps {
+interface NewUserFormProps extends BaseFormProps<User> {
   allUsers: User[];
-  onSave: (newUser: User) => void;
-  onCancel: () => void;
 }
 
 const DEFAULT_USER: EditableUser = {
@@ -27,7 +26,7 @@ const DEFAULT_USER: EditableUser = {
 };
 
 export default function NewUserForm({ allUsers, onSave, onCancel }: NewUserFormProps) {
-  const handleSave = (userData: EditableUser & { imageUrl?: string }) => {
+  const handleSave = async (userData: EditableUser & { imageUrl?: string }) => {
     const newUser: User = {
       login: {
         uuid: crypto.randomUUID(),
@@ -37,7 +36,8 @@ export default function NewUserForm({ allUsers, onSave, onCancel }: NewUserFormP
         medium: userData.imageUrl || `/api/placeholder/100/100`
       }
     };
-    onSave(newUser);
+    
+    await onSave(newUser);
   };
 
   return (

@@ -27,3 +27,13 @@ export interface User extends EditableUser {
     uuid: string;
   };
 }
+
+export interface ApiResponse {
+  results: User[];
+  info: any;
+}
+
+export interface ValidationError {
+  field: string;
+  message: string;
+}

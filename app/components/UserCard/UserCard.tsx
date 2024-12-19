@@ -6,13 +6,13 @@ import { MailIcon, LocationIcon, EditIcon, TrashIcon } from '../../icons';
 import Modal from '../Modal/Modal';
 import EditUserForm from '../EditUserForm/EditUserForm';
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
-import { User } from '@/types/user';
+import { User } from '../../types/user';
 
 interface UserCardProps {
   user: User;
   allUsers: User[];
-  onUpdate: (updatedUser: User) => void;
-  onDelete: (userId: string) => void;
+  onUpdate: (updatedUser: User) => Promise<void>;
+  onDelete: (userId: string) => Promise<void>;
 }
 
 export default function UserCard({ 
@@ -32,15 +32,23 @@ export default function UserCard({
   const fullName = `${user.name.title || ''} ${user.name.first || ''} ${user.name.last || ''}`.trim();
   const address = `${user.location.street?.name || ''} ${user.location.street?.number || ''}, ${user.location.city || ''}, ${user.location.country || ''}`.trim();
 
-  const handleSave = (updatedUser: User) => {
-    setUser(updatedUser);
-    onUpdate(updatedUser);
-    setIsEditing(false);
+  const handleSave = async (updatedUser: User) => {
+    try {
+      setUser(updatedUser);
+      await onUpdate(updatedUser);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update user:', error);
+    }
   };
 
-  const handleDelete = () => {
-    onDelete(user.login.uuid);
-    setIsConfirmingDelete(false);
+  const handleDelete = async () => {
+    try {
+      await onDelete(user.login.uuid);
+      setIsConfirmingDelete(false);
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+    }
   };
 
   return (
