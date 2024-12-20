@@ -59,11 +59,12 @@ export default function UserList() {
         />
       </div>
 
-      <NewUserForm
-        isOpen={isAddingUser} 
-        setIsAddingUser={setIsAddingUser}
-        allUsers={users}  // Add this line
-      />
+      {isAddingUser && (
+        <NewUserForm 
+          isOpen={isAddingUser}
+          setIsAddingUser={setIsAddingUser}
+        />
+      )}
     </>
   );
 }
