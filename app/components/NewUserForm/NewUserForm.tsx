@@ -5,8 +5,9 @@ import Modal from "../Modal/Modal";
 import { User, EditableUser } from "../../types/user";
 import { BaseFormProps } from "../../types/form";
 import { useUsers } from "@/hooks/useUsers";
+
 interface NewUserFormProps extends BaseFormProps<User> {
-  allUsers: User[];
+  // allUsers: User[];
   isOpen: boolean;
   setIsAddingUser: any;
 }
@@ -29,7 +30,6 @@ const DEFAULT_USER: EditableUser = {
 };
 
 export default function NewUserForm({
-  allUsers,
   isOpen,
   setIsAddingUser,
 }: NewUserFormProps) {
@@ -49,12 +49,12 @@ export default function NewUserForm({
 
     setIsAddingUser(false);
   };
-
+  const { users } = useUsers();
   return (
     <Modal isOpen={isOpen} title="Add New User">
       <UserForm<EditableUser>
         initialData={DEFAULT_USER}
-        allUsers={allUsers}
+        allUsers={users}
         onSave={handleSave}
         onCancel={() => setIsAddingUser(false)}
         submitLabel="Add User"

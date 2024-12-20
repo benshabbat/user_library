@@ -1,18 +1,18 @@
 "use client";
 
-import UserCard from "../UserCard/UserCard";
-import NewUserForm from "../NewUserForm/NewUserForm";
-import SearchBar from "../SearchBar/SearchBar";
 import styles from "./UserList.module.scss";
 import { useUsers } from "@/hooks/useUsers";
-//TODO:TO TRY DRY HERE
+import NewUserForm from "../NewUserForm/NewUserForm";
+import SearchBar from "../SearchBar/SearchBar";
+import UserGrid from "../UserGrid/UserGrid";
+
 export default function UserList() {
   const {
     filteredUsers,
-    setSearchQuery,
     searchQuery,
-    setIsAddingUser,
+    setSearchQuery,
     isAddingUser,
+    setIsAddingUser,
     users,
     isLoading,
     error,
@@ -31,50 +31,35 @@ export default function UserList() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>User Library</h1>
-        <button
-          className={styles.addButton}
-          onClick={() => setIsAddingUser(true)}
-        >
-          Add User
-        </button>
+    <>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>User Library</h1>
+          <button
+            className={styles.addButton}
+            onClick={() => setIsAddingUser(true)}
+          >
+            Add User
+          </button>
+        </div>
+
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by name, email, ID or location..."
+        />
+
+        <UserGrid
+          filteredUsers={filteredUsers}
+          users={users}
+          updateUser={updateUser}
+          deleteUser={deleteUser}
+          isUpdating={isUpdating}
+          isDeleting={isDeleting}
+        />
       </div>
 
-      <SearchBar
-        value={searchQuery}
-        onChange={setSearchQuery}
-        placeholder="Search by name, email, ID or location..."
-      />
-
-      <div className={styles.grid}>
-        {filteredUsers.length > 0 ? (
-          filteredUsers.map((user) =>
-            user && user.login?.uuid ? (
-              <UserCard
-                key={user.login.uuid}
-                user={user}
-                allUsers={users}
-                onUpdate={updateUser}
-                onDelete={deleteUser}
-                isUpdating={isUpdating}
-                isDeleting={isDeleting}
-              />
-            ) : null
-          )
-        ) : (
-          <div className={styles.noResults}>
-            No users found matching your search.
-          </div>
-        )}
-      </div>
-
-      <NewUserForm
-        allUsers={users}
-        isOpen={isAddingUser}
-        setIsAddingUser={setIsAddingUser}
-      />
-    </div>
+      <NewUserForm isOpen={isAddingUser} setIsAddingUser={setIsAddingUser} />
+    </>
   );
 }

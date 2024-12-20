@@ -1,22 +1,22 @@
-export interface UserName {
+export interface Name {
   title: string;
   first: string;
   last: string;
 }
 
-export interface UserLocation {
+export interface Location {
+  country: string;
+  city: string;
   street: {
     name: string;
     number: number;
   };
-  city: string;
-  country: string;
 }
 
 export interface EditableUser {
-  name: UserName;
+  name: Name;
   email: string;
-  location: UserLocation;
+  location: Location;
   picture?: {
     medium: string;
   };
@@ -28,6 +28,10 @@ export interface User extends EditableUser {
   };
 }
 
+export interface UserResponse {
+  results: User[];
+}
+
 export interface ApiResponse {
   results: User[];
   info: any;
@@ -37,3 +41,12 @@ export interface ValidationError {
   field: string;
   message: string;
 }
+
+
+
+
+
+
+
+
+
