@@ -2,7 +2,6 @@
 
 import { ChangeEvent } from 'react';
 import styles from './SearchBar.module.scss';
-
 interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
@@ -13,7 +12,6 @@ export default function SearchBar({ value, onChange, placeholder = 'Search users
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
-
   return (
     <div className={styles.searchContainer}>
       <input

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User, EditableUser } from '../types/user';
 import { userService } from '../services/user.service';
-import { useState } from "react";
+import { useState, useMemo } from "react";
 export const userKeys = {
   all: ['users'] as const,
   lists: () => [...userKeys.all, 'list'] as const,
@@ -13,6 +13,8 @@ export const userKeys = {
 export function useUsers() {
 
   const [isAddingUser, setIsAddingUser] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const queryClient = useQueryClient();
 
   const { data: users = [], isLoading, error } = useQuery({
@@ -45,7 +47,34 @@ export function useUsers() {
     },
   });
 
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return users;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return users.filter((user) => {
+      const fullName =
+        `${user.name.title} ${user.name.first} ${user.name.last}`.toLowerCase();
+      const location =
+        `${user.location.street.name} ${user.location.city} ${user.location.country}`.toLowerCase();
+      const searchFields = [
+        fullName,
+        user.email.toLowerCase(),
+        user.login.uuid.toLowerCase(),
+        location,
+      ];
+
+      return searchFields.some((field) => field.includes(query));
+    });
+  }, [users, searchQuery]);
+
+
   return {
+    filteredUsers,
+    setSearchQuery,
+    searchQuery,
     isAddingUser,
     setIsAddingUser,
     users,
