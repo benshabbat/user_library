@@ -5,20 +5,24 @@ import styles from './UserGrid.module.scss';
 interface UserGridProps {
   filteredUsers: User[];
   users: User[];
-  onUpdate: (user: User) => void;
-  onDelete: (userId: string) => void;
+  updateUser: (user: User) => void;
+  deleteUser: (userId: string) => void;
   isUpdating: boolean;
   isDeleting: boolean;
 }
 
-export default function UserGrid({
-  filteredUsers,
-  users,
-  onUpdate,
-  onDelete,
-  isUpdating,
-  isDeleting
+export default function UserGrid({ 
+  filteredUsers, 
+  users, 
+  updateUser, 
+  deleteUser, 
+  isUpdating, 
+  isDeleting 
 }: UserGridProps) {
+  if (filteredUsers.length === 0) {
+    return <div className={styles.noResults}>No users found matching your search.</div>;
+  }
+
   return (
     <div className={styles.grid}>
       {filteredUsers.map((user) =>
@@ -27,8 +31,8 @@ export default function UserGrid({
             key={user.login.uuid}
             user={user}
             allUsers={users}
-            onUpdate={onUpdate}
-            onDelete={onDelete}
+            onUpdate={updateUser}
+            onDelete={deleteUser}
             isUpdating={isUpdating}
             isDeleting={isDeleting}
           />

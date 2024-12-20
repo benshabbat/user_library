@@ -49,20 +49,14 @@ export default function UserList() {
           placeholder="Search by name, email, ID or location..."
         />
 
-        {filteredUsers.length > 0 ? (
-          <UserGrid
-            filteredUsers={filteredUsers}
-            users={users}
-            onUpdate={updateUser}
-            onDelete={deleteUser}
-            isUpdating={isUpdating}
-            isDeleting={isDeleting}
-          />
-        ) : (
-          <div className={styles.noResults}>
-            No users found matching your search.
-          </div>
-        )}
+        <UserGrid 
+          filteredUsers={filteredUsers}
+          users={users}
+          updateUser={updateUser}
+          deleteUser={deleteUser}
+          isUpdating={isUpdating}
+          isDeleting={isDeleting}
+        />
       </div>
 
       <NewUserForm isOpen={isAddingUser} setIsAddingUser={setIsAddingUser} />
