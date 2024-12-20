@@ -1,26 +1,48 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import UserCard from '../UserCard/UserCard';
-import Modal from '../Modal/Modal';
-import NewUserForm from '../NewUserForm/NewUserForm';
-import styles from './UserList.module.scss';
-import { useUsers } from '../../hooks/useUsers';
-import { User } from '../../types/user';
+import { useState, useMemo } from "react";
+import UserCard from "../UserCard/UserCard";
+
+import NewUserForm from "../NewUserForm/NewUserForm";
+import SearchBar from "../SearchBar/SearchBar";
+import styles from "./UserList.module.scss";
+import { useUsers } from "@/hooks/useUsers";
 
 export default function UserList() {
-  const [isAddingUser, setIsAddingUser] = useState(false);
-  const { 
-    users, 
-    isLoading, 
-    error, 
-    createUser, 
-    updateUser, 
+  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    setIsAddingUser,
+    isAddingUser,
+    users,
+    isLoading,
+    error,
+    updateUser,
     deleteUser,
-    isCreating,
     isUpdating,
-    isDeleting
+    isDeleting,
   } = useUsers();
+
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return users;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    return users.filter((user) => {
+      const fullName =
+        `${user.name.title} ${user.name.first} ${user.name.last}`.toLowerCase();
+      const location =
+        `${user.location.street.name} ${user.location.city} ${user.location.country}`.toLowerCase();
+      const searchFields = [
+        fullName,
+        user.email.toLowerCase(),
+        user.login.uuid.toLowerCase(),
+        location,
+      ];
+
+      return searchFields.some((field) => field.includes(query));
+    });
+  }, [users, searchQuery]);
 
   if (isLoading) {
     return <div className={styles.loading}>Loading users...</div>;
@@ -34,46 +56,43 @@ export default function UserList() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>User Library</h1>
-        <button 
+        <button
           className={styles.addButton}
           onClick={() => setIsAddingUser(true)}
-          disabled={isCreating}
         >
           Add User
         </button>
       </div>
 
+      <SearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search by name, email, ID or location..."
+      />
+
       <div className={styles.grid}>
-        {users.map((user) => (
-          user && user.login?.uuid ? (
-            <UserCard 
-              key={user.login.uuid} 
-              user={user} 
-              allUsers={users}
-              onUpdate={updateUser}
-              onDelete={deleteUser}
-              isUpdating={isUpdating}
-              isDeleting={isDeleting}
-            />
-          ) : null
-        ))}
+        {filteredUsers.length > 0 ? (
+          filteredUsers.map((user) =>
+            user && user.login?.uuid ? (
+              <UserCard
+                key={user.login.uuid}
+                user={user}
+                allUsers={users}
+                onUpdate={updateUser}
+                onDelete={deleteUser}
+                isUpdating={isUpdating}
+                isDeleting={isDeleting}
+              />
+            ) : null
+          )
+        ) : (
+          <div className={styles.noResults}>
+            No users found matching your search.
+          </div>
+        )}
       </div>
 
-      <Modal 
-        isOpen={isAddingUser}
-        onClose={() => setIsAddingUser(false)}
-        title="Add New User"
-      >
-        <NewUserForm
-          allUsers={users}
-          onSave={(user) => {
-            createUser(user);
-            setIsAddingUser(false);
-          }}
-          onCancel={() => setIsAddingUser(false)}
-          isSubmitting={isCreating}
-        />
-      </Modal>
+      <NewUserForm allUsers={users} isOpen={isAddingUser} setIsAddingUser={setIsAddingUser} />
     </div>
   );
 }

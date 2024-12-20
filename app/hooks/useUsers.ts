@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { User, EditableUser } from '../types/user';
 import { userService } from '../services/user.service';
-
+import { useState } from "react";
 export const userKeys = {
   all: ['users'] as const,
   lists: () => [...userKeys.all, 'list'] as const,
@@ -11,6 +11,8 @@ export const userKeys = {
 };
 
 export function useUsers() {
+
+  const [isAddingUser, setIsAddingUser] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: users = [], isLoading, error } = useQuery({
@@ -44,6 +46,8 @@ export function useUsers() {
   });
 
   return {
+    isAddingUser,
+    setIsAddingUser,
     users,
     isLoading,
     error,

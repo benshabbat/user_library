@@ -1,31 +1,39 @@
-'use client';
+"use client";
 
-import UserForm from '../UserForm/UserForm';
-import { User, EditableUser } from '../../types/user';
-import { BaseFormProps } from '../../types/form';
-
+import UserForm from "../UserForm/UserForm";
+import Modal from "../Modal/Modal";
+import { User, EditableUser } from "../../types/user";
+import { BaseFormProps } from "../../types/form";
+import { useUsers } from "@/hooks/useUsers";
 interface NewUserFormProps extends BaseFormProps<User> {
   allUsers: User[];
+  isOpen: boolean;
+  setIsAddingUser: any;
 }
 
 const DEFAULT_USER: EditableUser = {
   name: {
-    title: '',
-    first: '',
-    last: '',
+    title: "",
+    first: "",
+    last: "",
   },
-  email: '',
+  email: "",
   location: {
     street: {
-      name: '',
+      name: "",
       number: 0,
     },
-    city: '',
-    country: '',
+    city: "",
+    country: "",
   },
 };
 
-export default function NewUserForm({ allUsers, onSave, onCancel }: NewUserFormProps) {
+export default function NewUserForm({
+  allUsers,
+  isOpen,
+  setIsAddingUser,
+}: NewUserFormProps) {
+  const { createUser } = useUsers();
   const handleSave = async (userData: EditableUser & { imageUrl?: string }) => {
     const newUser: User = {
       login: {
@@ -33,20 +41,24 @@ export default function NewUserForm({ allUsers, onSave, onCancel }: NewUserFormP
       },
       ...userData,
       picture: {
-        medium: userData.imageUrl || `/api/placeholder/100/100`
-      }
+        medium: userData.imageUrl || `/api/placeholder/100/100`,
+      },
     };
-    
-    await onSave(newUser);
+
+    await createUser(newUser);
+
+    setIsAddingUser(false);
   };
 
   return (
-    <UserForm<EditableUser>
-      initialData={DEFAULT_USER}
-      allUsers={allUsers}
-      onSave={handleSave}
-      onCancel={onCancel}
-      submitLabel="Add User"
-    />
+    <Modal isOpen={isOpen} title="Add New User">
+      <UserForm<EditableUser>
+        initialData={DEFAULT_USER}
+        allUsers={allUsers}
+        onSave={handleSave}
+        onCancel={() => setIsAddingUser(false)}
+        submitLabel="Add User"
+      />
+    </Modal>
   );
 }
