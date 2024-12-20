@@ -1,22 +1,24 @@
-"use client";
+import { User } from '@/types/user';
+import UserCard from '../UserCard/UserCard';
+import styles from './UserGrid.module.scss';
 
-import UserCard from "../UserCard/UserCard";
+interface UserGridProps {
+  filteredUsers: User[];
+  users: User[];
+  onUpdate: (user: User) => void;
+  onDelete: (userId: string) => void;
+  isUpdating: boolean;
+  isDeleting: boolean;
+}
+
 export default function UserGrid({
   filteredUsers,
   users,
-  updateUser,
-  deleteUser,
+  onUpdate,
+  onDelete,
   isUpdating,
-  isDeleting,
-}) {
-  if (filteredUsers.length === 0) {
-    return (
-      <div className={styles.noResults}>
-        No users found matching your search.
-      </div>
-    );
-  }
-
+  isDeleting
+}: UserGridProps) {
   return (
     <div className={styles.grid}>
       {filteredUsers.map((user) =>
@@ -25,8 +27,8 @@ export default function UserGrid({
             key={user.login.uuid}
             user={user}
             allUsers={users}
-            onUpdate={updateUser}
-            onDelete={deleteUser}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
             isUpdating={isUpdating}
             isDeleting={isDeleting}
           />
